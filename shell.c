@@ -4,58 +4,7 @@
 #include <string.h>
 #include <sys/wait.h>
 
-/************************************************/
-
-int shell_cd(char **args);
-int shell_help(char **args);
-int shell_exit(char **args);
-
-char *builtin_str[] = {
-  "cd",
-  "help",
-  "exit"
-};
-
-int (*builtin_func[]) (char **) = {
-  &shell_cd,
-  &shell_help,
-  &shell_exit
-};
-
-int shell_num_builtins() {
-  return sizeof(builtin_str) / sizeof(char *);
-}
-
-int shell_cd(char **args) {
-  if (args[1] == NULL) {
-    fprintf(stderr, "shell: expected argument to \"cd\"\n");
-  } else {
-    if (chdir(args[1]) != 0) {
-      perror("shell");
-    }
-  }
-  return 1;
-}
-
-int shell_help(char **args) {
-  int i;
-  printf("Shell implementation\n");
-  printf("Type program names and arguments, and hit enter.\n");
-  printf("The following are built in:\n");
-
-  for (i = 0; i < shell_num_builtins(); i++) {
-    printf("  %s\n", builtin_str[i]);
-  }
-
-  printf("Use the man command for information on other programs.\n");
-  return 1;
-}
-
-int shell_exit(char **args){
-  return 0;
-}
-
-/*************************************************/
+#include "utils.h"
 
 int shell_launch(char** args) {
     pid_t pid;
@@ -65,16 +14,16 @@ int shell_launch(char** args) {
     pid = fork();
 
     if (pid == 0) {
-        // child process
+        /* child process */
         if (execvp(args[0], args) == -1) {
             perror("shell");
         }
         exit(EXIT_FAILURE);
     } else if (pid < 0) {
-        // error forking
+        /* error forking */
         perror("shell");
     } else {
-        // parent process
+        /* parent process */
         do {
             wpid = waitpid(pid, &status, WUNTRACED);
         } while (!WIFEXITED(status) && !WIFEXITED(status));
@@ -86,7 +35,7 @@ int shell_execute(char** args) {
     int i;
 
     if (args[0] == NULL) {
-        // an empty command was entered.
+        /* an empty command was entered. */
         return 1;
     }
 
@@ -114,10 +63,10 @@ char* shell_read_line(void) {
     }
 
     while (1) {
-        // read a character
+        /* read a character */
         c = getchar();
 
-        // if we hit EOF, replace it with a null character and return
+        /* if we hit EOF, replace it with a null character and return */
         if (c == EOF || c == '\n') {
             buffer[position] = '\0';
             return buffer;
@@ -127,7 +76,7 @@ char* shell_read_line(void) {
 
         ++position;
 
-        // if we have exceeded the buffer, reallocate.
+        /* if we have exceeded the buffer, reallocate. */
         if (position >= buffer_size) {
             buffer_size += SHELL_BUFFER_SIZE;
             buffer = realloc(buffer, buffer_size);
@@ -190,7 +139,7 @@ void shell_loop(void) {
     } while (status);
 }
 
-int main(int argс, char** argv) {
+int main(int argc, char** argv) {
     shell_loop();
 
     return EXIT_SUCCESS;
