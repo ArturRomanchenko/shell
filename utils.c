@@ -1,11 +1,5 @@
 #include "utils.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <sys/wait.h>
-
 char *builtin_str[] = {
   "cd",
   "help",
