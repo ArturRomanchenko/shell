@@ -4,7 +4,7 @@
 #include <string.h>
 #include <sys/wait.h>
 
-/*************************************************/
+/************************************************/
 
 int shell_cd(char **args);
 int shell_help(char **args);
